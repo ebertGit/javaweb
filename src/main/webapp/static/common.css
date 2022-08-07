@@ -1,0 +1,9 @@
+.center {
+  text-align: center;
+}
+
+/* 子元素全部居中 */
+.center * {
+  margin-right: auto;
+  margin-left: auto;
+}
