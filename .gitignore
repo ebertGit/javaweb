@@ -6,7 +6,6 @@ target/
 *.zip
 *.tar
 *.tar.gz
-.flattened-pom.xml
 
 # eclipse ignore
 .settings/
@@ -50,3 +49,6 @@ compiler/.gradle/*
 # log folder
 /log/*
 !/log/.gitkeep
+
+# Embedded DB file
+/db/

@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>myServlet</servlet-name>
-        <servlet-class>org.example.MyServlet</servlet-class>
+        <servlet-class>org.example.servlet.MyServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>myServlet</servlet-name>
