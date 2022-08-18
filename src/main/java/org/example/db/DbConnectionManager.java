@@ -18,8 +18,9 @@ public class DbConnectionManager {
     public Connection getConnection() {
         if (this.connection == null){
             try {
+                Class.forName(JDBC_DRIVER);
                 this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
                 this.connection = null;
             }
@@ -27,10 +28,22 @@ public class DbConnectionManager {
         return this.connection;
     }
 
+    public void releaseConnection() {
+        if (this.connection != null) {
+            try {
+                this.connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getCause());
+            }
+        }
+    }
+
     public static void main(String[] args) {
         try {
             // Load JDBC driver.
             Class.forName(JDBC_DRIVER);
+            // The other way to load JDBC driver.
+            // DriverManager.registerDriver(new org.h2.Driver());
 
             Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             Statement stmt = conn.createStatement();
@@ -50,6 +63,7 @@ public class DbConnectionManager {
                 String password = rs.getString("PASSWORD");
                 System.out.printf("name[%s], password[%s].", userName, password);
             }
+            rs.close();
 
             stmt.execute("SHUTDOWN");
             stmt.close();

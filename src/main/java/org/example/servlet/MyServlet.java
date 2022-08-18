@@ -1,5 +1,7 @@
 package org.example.servlet;
 
+import org.example.service.UserService;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -7,17 +9,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MyServlet extends HttpServlet {
 
-    private final Map<String, String> userAuthMap = new ConcurrentHashMap<String, String>(){
-        {
-            // userName -> password.
-            put("admin", "admin123");
-        }
-    };
+//    private final Map<String, String> userAuthMap = new ConcurrentHashMap<String, String>(){
+//        {
+//            // userName -> password.
+//            put("admin", "admin123");
+//        }
+//    };
+
+    private UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -42,8 +45,8 @@ public class MyServlet extends HttpServlet {
                 writer.println("</html>");
                 break;
             default:
-                // If was unknown url, forward to /hello.
-                req.getRequestDispatcher("/hello").forward(req, resp);
+                // If was unknown url, redirect to /hello.
+                resp.sendRedirect(req.getContextPath() + "/hello");
         }
     }
 
@@ -55,7 +58,8 @@ public class MyServlet extends HttpServlet {
         String uri = req.getRequestURI().substring(req.getContextPath().length());
         switch (uri){
             case "/hello/doLogin":
-                if (userAuthMap.get(userName) != null && Objects.equals(userAuthMap.get(userName), password)){
+                // if (userAuthMap.get(userName) != null && Objects.equals(userAuthMap.get(userName), password)){
+                if (userService.userAuthentication(userName, password)){
                     req.setAttribute("userName", userName);
                     req.setAttribute("msg", "Welcome back~");
                     req.getRequestDispatcher("/views/success.jsp").forward(req, resp);
@@ -66,8 +70,10 @@ public class MyServlet extends HttpServlet {
                 break;
             case "/hello/doRegistration":
                 if (userName != null && password != null){
-                    if (userAuthMap.get(userName) == null){
-                        userAuthMap.put(userName, password);
+                    // userAuthMap.put(userName, password);
+                    int count = userService.userRegistration(userName, password);
+                    // TODO use exception to judgement.
+                    if (count > 0){
                         req.setAttribute("userName", userName);
                         req.setAttribute("msg", "Registration was successful!");
                         req.getRequestDispatcher("/views/success.jsp").forward(req, resp);
