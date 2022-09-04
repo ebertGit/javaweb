@@ -10,6 +10,7 @@ import java.util.Objects;
 
 public class UserService {
 
+    // TODO use singleton.
     private final DbConnectionManager dbConnectionManager = new DbConnectionManager();
 
     /**

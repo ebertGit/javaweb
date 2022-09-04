@@ -18,9 +18,10 @@ public class DbConnectionManager {
     public Connection getConnection() {
         if (this.connection == null){
             try {
-                Class.forName(JDBC_DRIVER);
+                // Class.forName(JDBC_DRIVER);
                 this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            } catch (SQLException | ClassNotFoundException e) {
+            // } catch (SQLException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
                 this.connection = null;
             }

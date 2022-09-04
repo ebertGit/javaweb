@@ -15,6 +15,7 @@ public class MyServletContextListener implements ServletContextListener {
         DbConnectionManager.main(null);
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("contextDestroyed()");
         dbConnectionManager.releaseConnection();

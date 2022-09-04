@@ -5,15 +5,14 @@
 
 <html>
 <head>
-  <title>Login-error</title>
+  <title>Not Found</title>
   <link href="<%= request.getContextPath() %>/static/common.css" rel="stylesheet">
 </head>
 <body class="center">
-  <h1>error.jsp</h1>
-  <% out.println(new Date()); %>
+  <h1>notFound.jsp</h1>
   <hr>
   <div style="background-color: red;">
-    <h2><%= msg %></h2>
+    <h2>Page [<%= msg %>] was not found.</h2>
   </div>
 </body>
 </html>
