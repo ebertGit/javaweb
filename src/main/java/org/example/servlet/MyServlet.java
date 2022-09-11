@@ -3,25 +3,24 @@ package org.example.servlet;
 import org.example.controller.HelloWorldController;
 import org.example.controller.LoginController;
 import org.example.service.UserService;
+import org.example.servlet.context.MyWebApplicationContext;
 import org.example.servlet.method.HandlerMethod;
 import org.example.servlet.method.RequestMappingInfo;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MyServlet extends HttpServlet {
 
-    // TODO move into MyWebApplicationContext.
-    private UserService userService = new UserService();
+    private MyWebApplicationContext wac;
 
     // TODO add index for RequestMappingInfo: path -> RequestMappingInfo.
     private final Map<RequestMappingInfo, HandlerMethod> mappingLookup = new LinkedHashMap<>();
@@ -48,12 +47,13 @@ public class MyServlet extends HttpServlet {
         HandlerMethod hm = getHandlerMethod(req);
 
         if (hm != null) {
+            String beanName = hm.getBeanName();
             Method method = hm.getMethod();
             Object[] paramObjs = new Object[method.getParameterCount()];
             String errorMsg = null;
+            Exception exception = null;
 
             try {
-                // TODO use singleton instance(get instance and parameters from MyWebApplicationContext).
                 int i = 0;
                 // set parameters.
                 for (Parameter param : method.getParameters()) {
@@ -65,11 +65,11 @@ public class MyServlet extends HttpServlet {
                         // TODO add parameter binding.
                         paramObjs[i] = null;
                     }
-
                     i++;
                 }
                 // invoke method.
-                String result = (String) method.invoke(hm.getBeanType().newInstance(), paramObjs);
+                Object instanceObj = wac.getBeanByName(beanName);
+                String result = (String) method.invoke(instanceObj, paramObjs);
 
                 if (result != null && result != "") {
                     if (result.startsWith("redirect:")) {
@@ -81,17 +81,19 @@ public class MyServlet extends HttpServlet {
                 }
             } catch (IllegalAccessException e) {
                 errorMsg = e.toString();
+                exception = e;
             } catch (InvocationTargetException e) {
                 errorMsg = e.toString();
-            } catch (InstantiationException e) {
-                errorMsg = e.toString();
+                exception = e;
             } catch (Exception e) {
                 errorMsg = e.toString();
+                exception = e;
             }
 
             // if error happened, show error page.
             if (errorMsg != null) {
                 req.setAttribute("msg", errorMsg);
+                req.setAttribute("exception", exception);
                 req.getRequestDispatcher("/views/error.jsp").forward(req, resp);
             }
         } else {
@@ -127,6 +129,9 @@ public class MyServlet extends HttpServlet {
     public void init() throws ServletException {
         System.out.println("MyServlet init() called.");
         createHandlerMapping();
+
+        ServletContext servletContext = getServletContext();
+        wac = (MyWebApplicationContext) servletContext.getAttribute("myWebApplicationContext");
     }
 
     /**
@@ -161,6 +166,15 @@ public class MyServlet extends HttpServlet {
             e.printStackTrace();
         }
 
+        /* Request mapping: /hello/register GET,POST -> LoginController#initRegister */
+        try {
+            Class<?> clazz = LoginController.class;
+            Method method = clazz.getMethod("initRegister");
+            doCreateMapping(clazz, method, "/hello/register", "GET", "POST");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
         /* Request mapping: /hello/doRegistration POST -> LoginController#doRegistration */
         try {
             Class<?> clazz = LoginController.class;
@@ -179,8 +193,14 @@ public class MyServlet extends HttpServlet {
      * @param param the list of httpMethod
      */
     private void doCreateMapping(Class<?> clazz, Method method, String path, String...param) {
+        // set bean name by class name and toggle first char to lower case.
+        char[] nameChar = clazz.getName().toCharArray();
+        // class name is contain package name, so do not toggle to lower case.
+//        nameChar[0] = String.valueOf(nameChar[0]).toLowerCase().toCharArray()[0];
+        String beanName = new String(nameChar);
+
+        HandlerMethod hm = new HandlerMethod(beanName, clazz, method);
         RequestMappingInfo rmi = new RequestMappingInfo(path, param);
-        HandlerMethod hm = new HandlerMethod(clazz, method);
         mappingLookup.put(rmi, hm);
     }
 

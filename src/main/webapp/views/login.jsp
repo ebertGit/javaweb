@@ -2,44 +2,36 @@
 <head>
   <title>login</title>
   <link href="<%= request.getContextPath() %>/static/common.css" rel="stylesheet">
+  <style>
+    .login-item {
+      margin: 30px 0;
+    }
+    .signUp-text {
+      color: rgb(177, 177, 177);
+      font-size: small;
+    }
+    .signUp-text a {
+      text-decoration: none;
+    }
+    .signUp-text a:visited {
+      color: rgb(177, 177, 177);
+    }
+  </style>
 </head>
 <body class="center">
 <div>
   <div style="background-color: green;">
     <h1>Login form</h1>
   </div>
-  <form action="doLogin" method="post">
-    <table width="600px">
-      <tr>
-        <th>User Name</th>
-        <td><input type="text" name="username" /></td>
-      </tr>
-      <tr>
-        <th>Password</th>
-        <td><input type="password" name="password" /></td>
-      </tr>
-    </table>
-    <input type="submit" value="Login" />
-  </form>
-</div>
-<hr>
-<div>
-  <div style="background-color: pink;">
-    <h1>Registration form</h1>
+  <div class="main-panel">
+    <p class="panel-title" align="center">Login</p>
+    <form action="doLogin" method="post">
+      <div class="login-item"><input type="text" name="username" placeholder="User Name" class="input-text" /></div>
+      <div class="login-item"><input type="password" name="password" placeholder="Password" class="input-password" /></div>
+      <div style="margin-top: 50px;"><input type="submit" value="Login" class="submit" /></div>
+    </form>
+    <div class="signUp-text"><a href="<%= request.getContextPath() %>/hello/register">Sign up</a></div>
   </div>
-  <form action="doRegistration" method="post">
-    <table width="600px">
-      <tr>
-        <th>User Name</th>
-        <td><input type="text" name="username" /></td>
-      </tr>
-      <tr>
-        <th>Password</th>
-        <td><input type="password" name="password" /></td>
-      </tr>
-    </table>
-    <input type="submit" value="Registry" />
-  </form>
 </div>
 </body>
 </html>

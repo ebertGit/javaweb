@@ -2,6 +2,7 @@
 <%@ page import="java.util.Date" %>
 
 <% String msg = (String)request.getAttribute("msg"); %>
+<% Exception exception = (Exception)request.getAttribute("exception"); %>
 
 <html>
 <head>
@@ -15,5 +16,13 @@
   <div style="background-color: red;">
     <h2><%= msg %></h2>
   </div>
+  <div>
+    <%
+      if (exception != null) {
+        response.getWriter().println("printStackTrace:");
+        exception.printStackTrace(response.getWriter());
+      }
+    %>
+  <div>
 </body>
 </html>

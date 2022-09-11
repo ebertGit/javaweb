@@ -9,8 +9,7 @@ import java.io.IOException;
 
 public class LoginController {
 
-    // TODO use injection(singleton).
-    private UserService userService = new UserService();
+    private UserService userService;
 
     // case "/hello/login":
     public String initLogin(){
@@ -32,6 +31,11 @@ public class LoginController {
 //                req.getRequestDispatcher("/views/error.jsp").forward(req, resp);
                 return "/views/error.jsp";
             }
+    }
+
+    // case: /hello/register
+    public String initRegister() {
+        return "/views/register.jsp";
     }
 
     // case: /hello/doRegistration

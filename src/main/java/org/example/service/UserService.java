@@ -11,7 +11,11 @@ import java.util.Objects;
 public class UserService {
 
     // TODO use singleton.
-    private final DbConnectionManager dbConnectionManager = new DbConnectionManager();
+    private final DbConnectionManager dbConnectionManager;
+
+    public UserService(DbConnectionManager dbConnectionManager) {
+        this.dbConnectionManager = dbConnectionManager;
+    }
 
     /**
      * Authenticate The name and password.<br>
